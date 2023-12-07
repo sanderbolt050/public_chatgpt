@@ -50,6 +50,18 @@ case "$organize_option" in
             fi
 
             copy_and_verify "$photo" "$photo_directory/$month/"
+            
+            # Verwijder origineel als de kopie succesvol is
+            original_hash=$(calculate_hash "$photo")
+            copied_photo="$photo_directory/$month/$(basename "$photo")"
+            copy_hash=$(calculate_hash "$copied_photo")
+
+            if [ "$original_hash" == "$copy_hash" ]; then
+                rm "$photo"
+                echo "Originele foto verwijderd: $photo"
+            else
+                echo "Fout bij het verwijderen van originele foto: $photo"
+            fi
         done
         ;;
     "week")
@@ -62,6 +74,18 @@ case "$organize_option" in
             fi
 
             copy_and_verify "$photo" "$photo_directory/week_$week/"
+            
+            # Verwijder origineel als de kopie succesvol is
+            original_hash=$(calculate_hash "$photo")
+            copied_photo="$photo_directory/week_$week/$(basename "$photo")"
+            copy_hash=$(calculate_hash "$copied_photo")
+
+            if [ "$original_hash" == "$copy_hash" ]; then
+                rm "$photo"
+                echo "Originele foto verwijderd: $photo"
+            else
+                echo "Fout bij het verwijderen van originele foto: $photo"
+            fi
         done
         ;;
     *)
@@ -69,21 +93,5 @@ case "$organize_option" in
         exit 1
         ;;
 esac
-
-# Verwijder originele foto's als de kopieën succesvol zijn
-for photo in "$photo_directory"/*; do
-    original_photo="$photo"
-    copied_photo="$photo_directory/$month/$(basename "$photo")"
-    
-    original_hash=$(calculate_hash "$original_photo")
-    copy_hash=$(calculate_hash "$copied_photo")
-
-    if [ "$original_hash" == "$copy_hash" ]; then
-        rm "$original_photo"
-        echo "Originele foto verwijderd: $original_photo"
-    else
-        echo "Fout bij het verwijderen van originele foto: $original_photo"
-    fi
-done
 
 echo "Organisatie voltooid."
